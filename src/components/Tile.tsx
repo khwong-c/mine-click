@@ -52,7 +52,7 @@ export function Tile(prop: {
     const yEase: Easing[] = (vY <= 0) ? ["circOut", "circIn"] : ["circIn"];
 
     return <motion.div
-        className="absolute w-32 h-32"
+        className="absolute w-16 md:w-24 lg:w-32 h-16 md:h-24 lg:h-32"
         animate={{
             opacity: ["100%", "0%"],
             x: xPath,

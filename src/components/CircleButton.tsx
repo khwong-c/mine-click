@@ -19,7 +19,7 @@ export function CircleButton(prop: {
     return <button
         onClick={onClick}
         onMouseDown={onPress} onMouseUp={onRelease} onMouseLeave={onRelease}
-        className={`w-64 h-64 rounded-full ${isPressed ? 'bg-green-600 scale-95' : 'bg-green-500 hover:scale-105'} flex items-center justify-center shadow-lg hover:bg-green-400 transition-all duration-200 focus:outline-none z-20`}
+        className={`w-24 md:w-32 lg:w-48 h-24 md:h-32 lg:h-48 rounded-full ${isPressed ? 'bg-green-600 scale-95' : 'bg-green-500 hover:scale-105'} flex items-center justify-center shadow-lg hover:bg-green-400 transition-all duration-200 focus:outline-none z-20`}
         aria-label="Spawn tiles">
         <div className={`relative w-20 h-20 ${isPressed ? 'scale-95' : ''} transition-transform duration-200`}>
             <img
