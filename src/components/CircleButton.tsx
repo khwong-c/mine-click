@@ -1,5 +1,5 @@
 import {useState} from "react";
-import PickaxeImage from "../images/Enchanted_Diamond_Pickaxe.gif";
+import GrassBlock from "../images/Grass_Block.png";
 
 export function CircleButton(prop: {
     // onPress: () => void,
@@ -23,7 +23,7 @@ export function CircleButton(prop: {
         aria-label="Spawn tiles">
         <div className={`relative w-20 h-20 ${isPressed ? 'scale-95' : ''} transition-transform duration-200`}>
             <img
-                src={PickaxeImage}
+                src={GrassBlock}
                 className="w-full h-full object-contain" draggable="false"/>
         </div>
     </button>;
