@@ -20,7 +20,7 @@ const TilePics = [
     picMycelium,
     picNetherGoldOre,
 ];
-export const TileNames = [
+const TileNames = [
     "Sand",
     "Schroomligh",
     "Podzol",
