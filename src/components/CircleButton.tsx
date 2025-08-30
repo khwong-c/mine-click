@@ -17,7 +17,7 @@ export function CircleButton(prop: {
         setPressed(false);
     };
 
-    return <motion.div className="z-20" whileTap={{scale: 0.8}}>
+    return <motion.div whileTap={{scale: 0.8}}>
         <button
             onClick={onClick}
             onMouseDown={onPress} onMouseUp={onRelease} onMouseLeave={onRelease}

@@ -2,13 +2,15 @@ import {useState, useReducer} from 'react';
 import {CircleButton} from './components/CircleButton';
 import {Tile, TileTypeCount, type TileProp} from './components/Tile';
 
+const center = {x: 50, y: 50,}
+
 export function App() {
     const [curID, setCurID] = useState(0);
 
     const getNewTile = () => {
         const result = {
             id: curID,
-            tileProp:{
+            tileProp: {
                 speed: {
                     r: Math.random() * 1.2 + 0.8,
                     theta: Math.random() * 2 * Math.PI,
@@ -37,12 +39,19 @@ export function App() {
 
 
     return <div className="w-full h-screen bg-gray-900 overflow-hidden relative">
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div
+            className="absolute w-fit h-fit z-20"
+            style={{
+                left: `${center.x}vw`, top: `${center.y}vh`,
+                transform: "translate(-50%, -50%)",
+            }}
+        >
             <CircleButton onClick={() => dispatch({command: "add"})}/>
         </div>
         {/* Render tiles */}
         {tiles.map(tile => <Tile
             key={tile.id} id={tile.id} tileProp={tile.tileProp}
+            center={center}
             onComplete={(id) => {
                 dispatch({command: "remove", id: id});
             }}

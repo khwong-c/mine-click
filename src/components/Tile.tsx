@@ -1,4 +1,5 @@
 import {motion, type Easing} from "motion/react"
+import type {Point} from "../type.ts"
 
 export interface TileProp {
     speed: { r: number, theta: number };
@@ -32,9 +33,10 @@ export const TileTypeCount = TileNames.length;
 export function Tile(prop: {
     id: number,
     tileProp: TileProp,
+    center: Point,
     onComplete: (id: number) => void,
 }) {
-    const {id, tileProp, onComplete} = prop;
+    const {id, tileProp, onComplete, center} = prop;
     const g = 2.0;
     const duration = 1.0;
 
@@ -43,9 +45,11 @@ export function Tile(prop: {
     const vX = Math.sin(theta) * r;
     const vY = Math.cos(theta) * r;
 
-    const xPath = ["50vw", `${vX * 50 + 50}vw`];
-    const yPath: string[] = ((vY <= 0) ? [0.0, -(vY ** 2) / 2 / g, g / 2 + vY] : [0.0, g / 2 + vY]).map(
-        y => `${y * 50 + 50}vh`
+    const xPath = [`${center.x}vw`, `${vX * 50 + center.x}vw`];
+    const yPath: string[] = (
+        (vY <= 0) ? [0.0, -(vY ** 2) / 2 / g, g / 2 + vY] : [0.0, g / 2 + vY]
+    ).map(
+        y => `${y * 50 + center.y}vh`
     );
     const yTime: number[] = (vY <= 0) ? [0, -vY, 1] : [0, 1];
     const yEase: Easing[] = (vY <= 0) ? ["circOut", "circIn"] : ["circIn"];
