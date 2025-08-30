@@ -13,7 +13,6 @@ export function App() {
                     r: Math.random() * 1.2 + 0.8,
                     theta: Math.random() * 2 * Math.PI,
                 },
-                rotate: Math.random() * 4 * Math.PI,
                 type: Math.floor(Math.random() * TileTypeCount)
             },
         }

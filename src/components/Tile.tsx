@@ -2,7 +2,6 @@ import {motion, type Easing} from "motion/react"
 
 export interface TileProp {
     speed: { r: number, theta: number };
-    rotate: number;
     type: number;
 }
 
@@ -80,28 +79,13 @@ export function Tile(prop: {
             onComplete(id);
         }}
     >
-        <motion.div
+        <div
             className="content-center w-full h-full"
             style={{
                 transform: "translate(-50%, -50%)",
             }}
-            animate={{
-                rotate: [
-                    theta - Math.PI,
-                    theta - Math.PI + tileProp.rotate * (vX > 0 ? 1 : -1),
-                ].map(
-                    t => `${Math.floor(t/Math.PI * 180)}deg`
-                ),
-            }}
-            transition={{
-                rotate: {
-                    duration: duration,
-                    times: [0, 1],
-                    ease: ["easeOut"],
-                },
-            }}
         >
-            <img src={TilePics[tileProp.type]}/>
-        </motion.div>
+            <img alt="tile" src={TilePics[tileProp.type]}/>
+        </div>
     </motion.div>;
 }
