@@ -19,7 +19,7 @@ interface GameState {
 export function App() {
     const [curID, setCurID] = useState(0);
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
-    const center = isPhone ? {x: 50, y: 75} : {x: 50, y: 50};
+    const center = isPhone ? {x: 50, y: 75} : {x: 50, y: 80};
 
     // Tiles
     const getNewTile = () => {
@@ -116,8 +116,9 @@ export function App() {
         className="w-full h-dvh bg-gray-900 overflow-hidden relative"
         style={{
             backgroundImage: `url(${tunnelBG})`,
-            backgroundSize: "cover",
+            backgroundSize: "contain",
             backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
         }}
     >
         <div
