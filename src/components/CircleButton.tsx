@@ -26,6 +26,7 @@ export function CircleButton(prop: {
             <div className={`relative w-20 h-20 `}>
                 <img
                     src={GrassBlock}
+                    onContextMenu={() => false}
                     alt="Press to mine"
                     className="w-full h-full object-contain" draggable="false"/>
             </div>
