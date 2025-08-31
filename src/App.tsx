@@ -40,7 +40,7 @@ export function App() {
     );
 
 
-    return <div className="w-full h-screen bg-gray-900 overflow-hidden relative">
+    return <div className="w-full h-dvh bg-gray-900 overflow-hidden relative">
         <div
             className="absolute w-fit h-fit z-20"
             style={{
