@@ -1,6 +1,6 @@
 import {motion} from "motion/react"
 
-import picPickAxe from "../images/pickaxe.webp";
+import picPickAxe from "../images/pickaxe.png";
 
 export function FeverPickAxe() {
     return <div
