@@ -1,5 +1,5 @@
 import {useState, useReducer} from 'react';
-import {useMediaQuery, useInterval} from "usehooks-ts";
+import {useMediaQuery, useInterval, useLocalStorage} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
 import {Tile, type TileProp} from './components/Tile';
 import {TileNames, TileTypeCount} from "./tileTypes";
@@ -17,6 +17,10 @@ interface GameState {
     tiles: { id: number, tileProp: TileProp }[];
     feverMode: boolean;
     autoTapping: boolean;
+}
+
+interface TileRecord {
+    [key: string]: number;
 }
 
 export function App() {
@@ -88,6 +92,16 @@ export function App() {
         },
     );
 
+    // Tile Record Logic
+    const [tileRecord, updateTileRecord] = useLocalStorage<TileRecord>("TileRecord", {});
+    const addTileToRecord = (newTile: string) => {
+        updateTileRecord({
+            ...tileRecord,
+            [newTile]: (tileRecord[newTile] ?? 0) + 1,
+        });
+    }
+
+
     // Fever mode logic
     // 95% chances to trigger fever mode for digging 50 tiles.
     // Around 15 seconds for human click, 50 seconds for auto-tap
@@ -102,6 +116,7 @@ export function App() {
         if (hitCount + 1 >= hitBeforeDigRatio) {
             playDig();
             const newTile = TileNames[Math.floor(Math.random() * TileTypeCount)];
+            addTileToRecord(newTile);
             dispatch({command: "add", tileType: newTile});
             if (!gameState.feverMode && Math.random() < feverChance) {
                 dispatch({command: "startFever"});
