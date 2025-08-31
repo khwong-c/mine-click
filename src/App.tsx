@@ -8,11 +8,13 @@ import {digSounds, digSoundSegments, digSoundSegmentsMap} from "./sound/sounds.t
 import {hitSounds, hitSoundSegments, hitSoundSegmentsMap} from "./sound/sounds.ts";
 
 import tunnelBG from "./images/tunnel.webp";
+import {FeverPickAxe} from "./components/FeverPickAxe.tsx";
 
-const hitBeforeDigRatio = 3;
+const feverModeDuration = 10000; // ms
 
 interface GameState {
     tiles: { id: number, tileProp: TileProp }[];
+    feverMode: boolean;
     autoTapping: boolean;
 }
 
@@ -83,20 +85,41 @@ export function App() {
                         ...prev,
                         autoTapping: false,
                     };
+                case "startFever":
+                    return {
+                        ...prev,
+                        feverMode: true,
+                    };
+                case "stopFever":
+                    return {
+                        ...prev,
+                        feverMode: false,
+                    };
                 default:
                     return prev;
             }
         }, {
             tiles: [],
+            feverMode: false,
             autoTapping: false,
         },
     );
+
+    // Fever mode logic
+    const feverChance = 0.1;
+    useInterval(() => {
+        dispatch({command: "stopFever"});
+    }, gameState.feverMode ? feverModeDuration : null);
+    const hitBeforeDigRatio = gameState.feverMode ? 1 : 3;
 
     const [hitCount, setHitCount] = useState(0);
     const onMining = () => {
         if (hitCount + 1 >= hitBeforeDigRatio) {
             playDig();
             dispatch({command: "add"})
+            if (!gameState.feverMode && Math.random() < feverChance) {
+                dispatch({command: "startFever"});
+            }
             setHitCount(0);
         } else {
             playHit();
@@ -110,6 +133,9 @@ export function App() {
             onMining();
         }
     }, autoTapInterval);
+
+
+    // Add tiles periodically
 
 
     return <div
@@ -142,6 +168,10 @@ export function App() {
                 dispatch({command: "remove", id: id});
             }}
         />)}
+        {/* Fever mode overlay */}
+        {
+            gameState.feverMode ? <FeverPickAxe/> : <></>
+        }
     </div>;
 }
 
