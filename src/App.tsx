@@ -1,5 +1,5 @@
 import {useState, useReducer} from 'react';
-import {useMediaQuery} from "usehooks-ts";
+import {useMediaQuery, useInterval} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
 import {Tile, TileTypeCount, type TileProp} from './components/Tile';
 import useSound from "use-sound";
