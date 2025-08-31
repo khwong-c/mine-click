@@ -106,7 +106,9 @@ export function App() {
     );
 
     // Fever mode logic
-    const feverChance = 0.1;
+    // 95% chances to trigger fever mode for digging 50 tiles.
+    // Around 15 seconds for human click, 50 seconds for auto-tap
+    const feverChance = 0.05816;
     useInterval(() => {
         dispatch({command: "stopFever"});
     }, gameState.feverMode ? feverModeDuration : null);
