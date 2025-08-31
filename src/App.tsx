@@ -1,11 +1,13 @@
 import {useState, useReducer} from 'react';
+import {useMediaQuery} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
 import {Tile, TileTypeCount, type TileProp} from './components/Tile';
 
-const center = {x: 50, y: 50,}
-
 export function App() {
     const [curID, setCurID] = useState(0);
+    const isPhone = useMediaQuery("only screen and (max-width : 481px)");
+    const center = isPhone ? {x: 50, y: 75} : {x: 50, y: 50};
+
 
     const getNewTile = () => {
         const result = {
