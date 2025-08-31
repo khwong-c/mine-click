@@ -6,27 +6,31 @@ export interface TileProp {
     type: number;
 }
 
-import picSand from "../images/sand.png";
-import picShroomlight from "../images/shroomlight.png";
-import picPodzol from "../images/Podzol.png";
-import picMycelium from "../images/Mycelium.png";
-import picNetherGoldOre from "../images/nether_gold_ore.png";
+import picStone from "../images/Stone.png";
+import picCoalOre from "../images/coal_ore.png";
+import picIronOre from "../images/Iron_Ore_JE3.png";
+import picGoldOre from "../images/Gold_Ore_JE3_BE2.png";
+import picDiamondOre from "../images/DiamondOreNew.png";
+import picRedstoneOre from "../images/Redstone_Ore_JE2_BE2.png";
+
 import {useState} from "react";
 
 
 const TilePics = [
-    picSand,
-    picShroomlight,
-    picPodzol,
-    picMycelium,
-    picNetherGoldOre,
+    picStone,
+    picCoalOre,
+    picIronOre,
+    picGoldOre,
+    picDiamondOre,
+    picRedstoneOre,
 ];
 const TileNames = [
-    "Sand",
-    "Schroomligh",
-    "Podzol",
-    "Mycelium",
-    "NetherGoldOre",
+    "Stone",
+    "Coal",
+    "Iron",
+    "Gold",
+    "Diamond",
+    "Redstone",
 ];
 export const TileTypeCount = TileNames.length;
 
