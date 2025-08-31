@@ -52,11 +52,12 @@ export function Tile(prop: {
     ).map(
         y => `${y * 50 + center.y}vh`
     );
-    const yTime: number[] = (vY <= 0) ? [0, -vY, 1] : [0, 1];
-    const yEase: Easing[] = (vY <= 0) ? ["circOut", "circIn"] : ["circIn"];
+
+    const [hidden, setHidden] = useState(true);
 
     return <motion.div
         className="absolute w-16 md:w-24 lg:w-32 h-16 md:h-24 lg:h-32"
+        hidden={hidden}
         animate={{
             opacity: ["100%", "0%"],
             x: xPath,
@@ -83,6 +84,7 @@ export function Tile(prop: {
         onAnimationComplete={() => {
             onComplete(id);
         }}
+        onAnimationStart={() => setHidden(false)}
     >
         <div className="content-center w-full h-full"
              style={{
