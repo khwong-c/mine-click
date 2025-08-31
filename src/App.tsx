@@ -7,6 +7,8 @@ import useSound from "use-sound";
 import {digSounds, digSoundSegments, digSoundSegmentsMap} from "./sound/sounds.ts";
 import {hitSounds, hitSoundSegments, hitSoundSegmentsMap} from "./sound/sounds.ts";
 
+const hitBeforeDigRatio = 3;
+
 export function App() {
     const [curID, setCurID] = useState(0);
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
@@ -62,9 +64,17 @@ export function App() {
         setHitSoundIndex(Math.floor(Math.random() * hitSoundSegments.length));
     }
 
+
+    const [hitCount, setHitCount] = useState(0);
     const onMining = () => {
-        playHit();
-        dispatch({command: "add"})
+        if (hitCount + 1 >= hitBeforeDigRatio) {
+            playDig();
+            dispatch({command: "add"})
+            setHitCount(0);
+        } else {
+            playHit();
+            setHitCount(hitCount + 1);
+        }
     }
 
 
