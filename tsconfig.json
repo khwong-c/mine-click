@@ -24,7 +24,8 @@
   },
   "include": [
     "src",
-    "src/images/image.d.ts"
+    "src/images/image.d.ts",
+    "src/sound/sound.d.ts"
   ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

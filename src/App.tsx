@@ -2,6 +2,9 @@ import {useState, useReducer} from 'react';
 import {useMediaQuery} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
 import {Tile, TileTypeCount, type TileProp} from './components/Tile';
+import useSound from "use-sound";
+
+import digSounds from "./sound/dig.ogg"
 
 export function App() {
     const [curID, setCurID] = useState(0);
@@ -39,6 +42,21 @@ export function App() {
         }, [],
     );
 
+    const [playDig] = useSound(digSounds, {
+        sprite: {
+            0: [0, 500],
+            1: [500, 500],
+            2: [1000, 500],
+            3: [1500, 500],
+        },
+        volume: 0.85,
+    });
+
+    const onMining = () => {
+        playDig({id: String(Math.floor(Math.random() * 4))});
+        dispatch({command: "add"})
+    }
+
 
     return <div className="w-full h-dvh bg-gray-900 overflow-hidden relative">
         <div
@@ -48,7 +66,7 @@ export function App() {
                 transform: "translate(-50%, -50%)",
             }}
         >
-            <CircleButton onClick={() => dispatch({command: "add"})}/>
+            <CircleButton onClick={onMining}/>
         </div>
         {/* Render tiles */}
         {tiles.map(tile => <Tile
