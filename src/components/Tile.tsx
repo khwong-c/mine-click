@@ -1,8 +1,8 @@
-import {motion, type Easing} from "motion/react"
+import {motion} from "motion/react"
 import type {Point} from "../type.ts"
 
 export interface TileProp {
-    speed: { r: number, theta: number };
+    speed: { vx: number, by: Point };
     type: number;
 }
 
@@ -11,6 +11,7 @@ import picShroomlight from "../images/shroomlight.png";
 import picPodzol from "../images/Podzol.png";
 import picMycelium from "../images/Mycelium.png";
 import picNetherGoldOre from "../images/nether_gold_ore.png";
+import {useState} from "react";
 
 
 const TilePics = [
@@ -37,17 +38,17 @@ export function Tile(prop: {
     onComplete: (id: number) => void,
 }) {
     const {id, tileProp, onComplete, center} = prop;
-    const g = 2.0;
     const duration = 1.0;
 
-    const {r, theta} = tileProp.speed;
+    const {vx, by} = tileProp.speed;
 
-    const vX = Math.sin(theta) * r;
-    const vY = Math.cos(theta) * r;
-
-    const xPath = [`${center.x}vw`, `${vX * 50 + center.x}vw`];
+    const xPath: string[] = (
+        [0.0, duration * vx]
+    ).map(
+        x => `${x * 50 + center.x}vw`
+    );
     const yPath: string[] = (
-        (vY <= 0) ? [0.0, -(vY ** 2) / 2 / g, g / 2 + vY] : [0.0, g / 2 + vY]
+        [0.0, 1.2]
     ).map(
         y => `${y * 50 + center.y}vh`
     );
@@ -65,17 +66,17 @@ export function Tile(prop: {
             x: {
                 duration: duration,
                 times: [0, 1],
-                ease: ["linear"],
+                ease: ["easeOut"],
             },
             y: {
                 duration: duration,
-                times: yTime,
-                ease: yEase,
+                times: [0, 1],
+                ease: [[by.x, by.y, by.x, by.y]],
             },
             opacity: {
                 duration: duration,
                 times: [0, 1],
-                ease: ["easeOut"],
+                ease: ["easeIn"],
             },
         }}
 
@@ -83,12 +84,10 @@ export function Tile(prop: {
             onComplete(id);
         }}
     >
-        <div
-            className="content-center w-full h-full"
-            style={{
-                transform: "translate(-50%, -50%)",
-            }}
-        >
+        <div className="content-center w-full h-full"
+             style={{
+                 transform: "translate(-50%, -50%)",
+             }}>
             <img alt="tile" src={TilePics[tileProp.type]}/>
         </div>
     </motion.div>;

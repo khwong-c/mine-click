@@ -12,8 +12,8 @@ export function App() {
             id: curID,
             tileProp: {
                 speed: {
-                    r: Math.random() * 1.2 + 0.8,
-                    theta: Math.random() * 2 * Math.PI,
+                    vx : (Math.random() + 0.5) * Math.sign(Math.random() - 0.5),
+                    by: {x: Math.random() * 0.5, y: -Math.random()*0.7 - 0.3},
                 },
                 type: Math.floor(Math.random() * TileTypeCount)
             },
