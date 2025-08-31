@@ -23,6 +23,9 @@ export function CircleButton(prop: {
             onClick={onClick}
             onMouseDown={onPressHandler} onMouseUp={onReleaseHandler} onMouseLeave={onReleaseHandler}
             onTouchStart={onPressHandler} onTouchEnd={onReleaseHandler} onTouchCancel={onReleaseHandler} onTouchMove={onReleaseHandler}
+            style={{
+                userSelect: "none",
+            }}
             className={`w-24 md:w-32 lg:w-48 h-24 md:h-32 lg:h-48 rounded-full ${isPressed ? 'bg-gray-500' : 'bg-gray-700 hover:scale-105'} flex items-center justify-center shadow-lg hover:bg-gray-600 transition-all duration-200 focus:outline-none`}
             aria-label="Spawn tiles">
             <div className={`relative w-20 h-20 `}>
@@ -34,6 +37,9 @@ export function CircleButton(prop: {
                             return false
                         }
                     }
+                    style={{
+                        userSelect: "none",
+                    }}
                     alt="Press to mine"
                     className="w-full h-full object-contain" draggable="false"/>
             </div>
