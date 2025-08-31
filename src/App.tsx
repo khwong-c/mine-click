@@ -7,6 +7,8 @@ import useSound from "use-sound";
 import {digSounds, digSoundSegments, digSoundSegmentsMap} from "./sound/sounds.ts";
 import {hitSounds, hitSoundSegments, hitSoundSegmentsMap} from "./sound/sounds.ts";
 
+import tunnelBG from "./images/tunnel.webp";
+
 const hitBeforeDigRatio = 3;
 
 interface GameState {
@@ -110,7 +112,14 @@ export function App() {
     }, autoTapInterval);
 
 
-    return <div className="w-full h-dvh bg-gray-900 overflow-hidden relative">
+    return <div
+        className="w-full h-dvh bg-gray-900 overflow-hidden relative"
+        style={{
+            backgroundImage: `url(${tunnelBG})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+        }}
+    >
         <div
             className="absolute w-fit h-fit z-20"
             style={{
