@@ -3,6 +3,7 @@ import {useMediaQuery, useInterval, useLocalStorage} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
 import {Tile, type TileProp} from './components/Tile';
 import {TileNames, TileTypeCount} from "./tileTypes";
+import type {TileRecord} from "./type";
 import useSound from "use-sound";
 
 import {digSounds, digSoundSegments, digSoundSegmentsMap} from "./sound/sounds.ts";
@@ -10,6 +11,7 @@ import {hitSounds, hitSoundSegments, hitSoundSegmentsMap} from "./sound/sounds.t
 
 import tunnelBG from "./images/tunnel.webp";
 import {FeverPickAxe} from "./components/FeverPickAxe.tsx";
+import {ClickRecord} from "./components/ClickRecord.tsx";
 
 const feverModeDuration = 10000; // ms
 
@@ -17,10 +19,6 @@ interface GameState {
     tiles: { id: number, tileProp: TileProp }[];
     feverMode: boolean;
     autoTapping: boolean;
-}
-
-interface TileRecord {
-    [key: string]: number;
 }
 
 export function App() {
@@ -148,6 +146,7 @@ export function App() {
             backgroundRepeat: "no-repeat",
         }}
     >
+        <ClickRecord tileRecord={tileRecord}/>
         <div
             className="absolute w-fit h-fit z-20"
             style={{
