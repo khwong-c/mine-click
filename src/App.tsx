@@ -9,6 +9,11 @@ import {hitSounds, hitSoundSegments, hitSoundSegmentsMap} from "./sound/sounds.t
 
 const hitBeforeDigRatio = 3;
 
+interface GameState {
+    tiles: { id: number, tileProp: TileProp }[];
+    autoTapping: boolean;
+}
+
 export function App() {
     const [curID, setCurID] = useState(0);
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
@@ -29,20 +34,6 @@ export function App() {
         setCurID(curID + 1);
         return result
     }
-    const [tiles, dispatch] = useReducer(
-        (prev: { id: number, tileProp: TileProp }[], payload: Partial<{ command: string, id: number }>) => {
-            switch (payload.command) {
-                case "add": {
-                    const newTile = getNewTile();
-                    return [...prev, newTile];
-                }
-                case "remove":
-                    return prev.filter(t => (t.id != payload.id));
-                default:
-                    return prev;
-            }
-        }, [],
-    );
 
     // Sound
     //
@@ -64,6 +55,40 @@ export function App() {
         setHitSoundIndex(Math.floor(Math.random() * hitSoundSegments.length));
     }
 
+    // Game Logic
+    const [gameState, dispatch] = useReducer(
+        (prev: GameState, payload: Partial<{ command: string, id: number }>) => {
+            switch (payload.command) {
+                case "add": {
+                    const newTile = getNewTile();
+                    return {
+                        ...prev,
+                        tiles: [...prev.tiles, newTile],
+                    };
+                }
+                case "remove":
+                    return {
+                        ...prev,
+                        tiles: prev.tiles.filter(tile => tile.id !== payload.id),
+                    };
+                case "startAutoTap":
+                    return {
+                        ...prev,
+                        autoTapping: true,
+                    };
+                case "stopAutoTap":
+                    return {
+                        ...prev,
+                        autoTapping: false,
+                    };
+                default:
+                    return prev;
+            }
+        }, {
+            tiles: [],
+            autoTapping: false,
+        },
+    );
 
     const [hitCount, setHitCount] = useState(0);
     const onMining = () => {
@@ -76,6 +101,13 @@ export function App() {
             setHitCount(hitCount + 1);
         }
     }
+    // Auto tapping logic
+    const autoTapInterval = 333;
+    useInterval(() => {
+        if (gameState.autoTapping) {
+            onMining();
+        }
+    }, autoTapInterval);
 
 
     return <div className="w-full h-dvh bg-gray-900 overflow-hidden relative">
@@ -86,10 +118,14 @@ export function App() {
                 transform: "translate(-50%, -50%)",
             }}
         >
-            <CircleButton onClick={onMining}/>
+            <CircleButton
+                onClick={onMining}
+                onPress={() => dispatch({command: "startAutoTap"})}
+                onRelease={() => dispatch({command: "stopAutoTap"})}
+            />
         </div>
         {/* Render tiles */}
-        {tiles.map(tile => <Tile
+        {gameState.tiles.map(tile => <Tile
             key={tile.id} id={tile.id} tileProp={tile.tileProp}
             center={center}
             onComplete={(id) => {
