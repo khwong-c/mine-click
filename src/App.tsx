@@ -12,6 +12,7 @@ import {hitSounds, hitSoundSegments, hitSoundSegmentsMap} from "./sound/sounds.t
 import tunnelBG from "./images/tunnel.webp";
 import {FeverPickAxe} from "./components/FeverPickAxe.tsx";
 import {ClickRecord} from "./components/ClickRecord.tsx";
+import {Title} from "./components/Title.tsx";
 
 const feverModeDuration = 10000; // ms
 
@@ -146,6 +147,7 @@ export function App() {
             backgroundRepeat: "no-repeat",
         }}
     >
+        <Title/>
         <ClickRecord tileRecord={tileRecord}/>
         <div
             className="absolute w-fit h-fit z-20"
