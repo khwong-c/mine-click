@@ -1,7 +1,8 @@
 import {useState, useReducer} from 'react';
 import {useMediaQuery, useInterval} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
-import {Tile, TileTypeCount, type TileProp} from './components/Tile';
+import {Tile, type TileProp} from './components/Tile';
+import {TileNames, TileTypeCount} from "./tileTypes";
 import useSound from "use-sound";
 
 import {digSounds, digSoundSegments, digSoundSegmentsMap} from "./sound/sounds.ts";
@@ -24,7 +25,7 @@ export function App() {
     const center = isPhone ? {x: 50, y: 75} : {x: 50, y: 80};
 
     // Tiles
-    const getNewTile = () => {
+    const getNewTile = (tileType: string) => {
         const result = {
             id: curID,
             tileProp: {
@@ -32,7 +33,7 @@ export function App() {
                     vx: (Math.random() + 0.5) * Math.sign(Math.random() - 0.5),
                     by: {x: Math.random() * 0.5, y: -Math.random() * 0.7 - 0.3},
                 },
-                type: Math.floor(Math.random() * TileTypeCount)
+                type: tileType,
             },
         }
         setCurID(curID + 1);
@@ -61,40 +62,22 @@ export function App() {
 
     // Game Logic
     const [gameState, dispatch] = useReducer(
-        (prev: GameState, payload: Partial<{ command: string, id: number }>) => {
+        (prev: GameState, payload: Partial<{ command: string, id: number, tileType: string }>) => {
             switch (payload.command) {
                 case "add": {
-                    const newTile = getNewTile();
-                    return {
-                        ...prev,
-                        tiles: [...prev.tiles, newTile],
-                    };
+                    const tileType = payload.tileType ?? TileNames[0];
+                    return {...prev, tiles: [...prev.tiles, getNewTile(tileType)],};
                 }
                 case "remove":
-                    return {
-                        ...prev,
-                        tiles: prev.tiles.filter(tile => tile.id !== payload.id),
-                    };
+                    return {...prev, tiles: prev.tiles.filter(tile => tile.id !== payload.id),};
                 case "startAutoTap":
-                    return {
-                        ...prev,
-                        autoTapping: true,
-                    };
+                    return {...prev, autoTapping: true,};
                 case "stopAutoTap":
-                    return {
-                        ...prev,
-                        autoTapping: false,
-                    };
+                    return {...prev, autoTapping: false,};
                 case "startFever":
-                    return {
-                        ...prev,
-                        feverMode: true,
-                    };
+                    return {...prev, feverMode: true,};
                 case "stopFever":
-                    return {
-                        ...prev,
-                        feverMode: false,
-                    };
+                    return {...prev, feverMode: false,};
                 default:
                     return prev;
             }
@@ -118,7 +101,8 @@ export function App() {
     const onMining = () => {
         if (hitCount + 1 >= hitBeforeDigRatio) {
             playDig();
-            dispatch({command: "add"})
+            const newTile = TileNames[Math.floor(Math.random() * TileTypeCount)];
+            dispatch({command: "add", tileType: newTile});
             if (!gameState.feverMode && Math.random() < feverChance) {
                 dispatch({command: "startFever"});
             }

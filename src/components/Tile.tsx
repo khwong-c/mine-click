@@ -3,37 +3,11 @@ import type {Point} from "../type.ts"
 
 export interface TileProp {
     speed: { vx: number, by: Point };
-    type: number;
+    type: string;
 }
 
-import picStone from "../images/Stone.png";
-import picCoalOre from "../images/coal_ore.png";
-import picIronOre from "../images/Iron_Ore_JE3.png";
-import picGoldOre from "../images/Gold_Ore_JE3_BE2.png";
-import picDiamondOre from "../images/DiamondOreNew.png";
-import picRedstoneOre from "../images/Redstone_Ore_JE2_BE2.png";
-
 import {useState} from "react";
-
-
-const TilePics = [
-    picStone,
-    picCoalOre,
-    picIronOre,
-    picGoldOre,
-    picDiamondOre,
-    picRedstoneOre,
-];
-const TileNames = [
-    "Stone",
-    "Coal",
-    "Iron",
-    "Gold",
-    "Diamond",
-    "Redstone",
-];
-export const TileTypeCount = TileNames.length;
-
+import {TilePics} from "../tileTypes";
 
 export function Tile(prop: {
     id: number,
