@@ -137,6 +137,10 @@ export function App() {
 
     // Add tiles periodically
 
+    useInterval(() => {
+        // dispatch({command: "add"})
+        console.log("Tiles:", tileRecord);
+    }, 100);
 
     return <div
         className="w-full h-dvh bg-gray-900 overflow-hidden relative"

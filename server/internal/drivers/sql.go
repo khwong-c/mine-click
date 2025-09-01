@@ -1,0 +1,102 @@
+package drivers
+
+import (
+	"log/slog"
+
+	"github.com/juju/errors"
+	"github.com/samber/do"
+	"github.com/xo/dburl"
+	"gorm.io/driver/sqlite"
+	"gorm.io/gorm"
+	gormLogger "gorm.io/gorm/logger"
+
+	"github.com/khwong-c/mine-click/server/internal/config"
+	"github.com/khwong-c/mine-click/server/internal/tooling/di"
+	"github.com/khwong-c/mine-click/server/internal/tooling/log"
+)
+
+type SQLType string
+
+const (
+	SQLTypeSQLite SQLType = "sqlite"
+)
+
+type SQL interface {
+	DB() *gorm.DB
+}
+
+type sql struct {
+	DBType SQLType
+
+	injector *do.Injector
+	db       *gorm.DB
+	logger   *slog.Logger
+}
+
+func (s *sql) Shutdown() error {
+	sqlDB, err := s.db.DB()
+	if err != nil {
+		return errors.Trace(err)
+	}
+	return sqlDB.Close()
+}
+
+func (s *sql) DB() *gorm.DB {
+	return s.db.Session(&gorm.Session{PrepareStmt: true})
+}
+
+func createDialector(connStr string) (gorm.Dialector, SQLType, error) {
+	url, err := dburl.Parse(connStr)
+	if err != nil {
+		return nil, "", errors.Trace(err)
+	}
+	dsn := url.DSN
+	switch url.Driver {
+	case "sqlite3":
+		return sqlite.Open(dsn), SQLTypeSQLite, nil
+	default:
+		return nil, "", errors.NotImplemented
+	}
+}
+
+func DialSQL(injector *do.Injector, target string) (SQL, error) {
+	cfg := di.InvokeOrProvide(injector, config.LoadConfig)
+	logger := di.InvokeOrProvide(injector, log.SetupLogger).New("sql").With("target", target)
+	dialector, dbType, err := createDialector(cfg.SQLTarget.Default)
+	if err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	var logLevel gormLogger.LogLevel
+	switch cfg.Logging.Level {
+	case slog.LevelDebug:
+		logLevel = gormLogger.Info
+	case slog.LevelInfo:
+		logLevel = gormLogger.Warn
+	case slog.LevelWarn:
+		logLevel = gormLogger.Warn
+	case slog.LevelError:
+		logLevel = gormLogger.Error
+	}
+
+	db, err := gorm.Open(dialector, &gorm.Config{
+		PrepareStmt: true,
+		Logger: gormLogger.NewSlogLogger(logger, gormLogger.Config{
+			SlowThreshold:             200,
+			Colorful:                  false,
+			IgnoreRecordNotFoundError: true,
+			ParameterizedQueries:      true,
+			LogLevel:                  logLevel,
+		}),
+	})
+	if err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	return &sql{
+		DBType:   dbType,
+		injector: injector,
+		db:       db,
+		logger:   logger,
+	}, nil
+}
