@@ -30,7 +30,7 @@ type Server struct {
 
 func (s *Server) Serve() {
 	go func() {
-		err := s.Server.ListenAndServe()
+		err := s.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.logger.Error("Server error", "err", err, "stack", errors.ErrorStack(err))
 		}
@@ -81,7 +81,7 @@ func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
 	r := chi.NewMux()
 	r.Use(middlewares.PanicRecovery(s.config, s.render, s.logger.With("panic", true)))
 	r.Use(chiMiddleware.Heartbeat("/health"))
-	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+	r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("OK"))
 	})

@@ -79,10 +79,11 @@ func DialSQL(injector *do.Injector, target string) (SQL, error) {
 		logLevel = gormLogger.Error
 	}
 
+	const slowStatementReportingThreshold = 200
 	db, err := gorm.Open(dialector, &gorm.Config{
 		PrepareStmt: true,
 		Logger: gormLogger.NewSlogLogger(logger, gormLogger.Config{
-			SlowThreshold:             200,
+			SlowThreshold:             slowStatementReportingThreshold,
 			Colorful:                  false,
 			IgnoreRecordNotFoundError: true,
 			ParameterizedQueries:      true,
