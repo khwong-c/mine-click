@@ -8,11 +8,16 @@ permissions:
   pages: write
   contents: read
   packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/configure-pages@v5
       - uses: pnpm/action-setup@v4
       - name: Use Node.js 22.x
@@ -27,15 +32,12 @@ jobs:
       #    - run: pnpm test
 
       - run: pnpm build
-      - uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v4
         with:
           path: './dist'
 
   build-backend:
     runs-on: ubuntu-latest
-    env:
-      REGISTRY: ghcr.io
-      IMAGE_NAME: ${{ github.repository }}
 
     steps:
       - uses: actions/checkout@v5
@@ -85,12 +87,42 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
+    outputs:
+      image_name: ${{ steps.meta.outputs.tags }}
+
   deploy:
     runs-on: ubuntu-latest
+    if: ${{ github.ref_name == 'main' }}
+    concurrency:
+      group: deployment
     needs:
       - build-frontend
       - build-backend
-    if: ${{ github.ref_name == 'main' }}
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+      - name: Transfer Configs
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          source: ./ci/nginx.conf,./ci/docker-compose.yaml
+          target: ./incoming
+
+      - name: Deploy configs and Update Stack
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            mv ./incoming/ci/docker-compose.yaml .
+            mv ./incoming/ci/nginx.conf nginx/conf/
+            rm -rf ./incoming
+            docker pull "${{ needs.build-backend.outputs.image_name }}"            
+            docker compose up --force-recreate -d
+
       - uses: actions/deploy-pages@v4
-        id: deployment
