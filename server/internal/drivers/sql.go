@@ -62,7 +62,7 @@ func createDialector(connStr string) (gorm.Dialector, SQLType, error) {
 func DialSQL(injector *do.Injector) (SQL, error) {
 	cfg := di.InvokeOrProvide(injector, config.LoadConfig)
 	logger := di.InvokeOrProvide(injector, log.SetupLogger).New("sql")
-	dialector, dbType, err := createDialector(cfg.SQLTarget.Default)
+	dialector, dbType, err := createDialector(cfg.DBSetup.DSN)
 	if err != nil {
 		return nil, errors.Trace(err)
 	}

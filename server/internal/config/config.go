@@ -24,14 +24,12 @@ const (
 )
 
 type Config struct {
-	Env       Env    `default:"development" usage:"Environment"`
-	HTTPPort  int    `default:"8086" usage:"Server port"`
-	DebugKey  string `default:"" usage:"Debug Key for more information"`
-	SQLTarget struct {
-		Default string `default:"sqlite3::memory:" usage:"Default SQL DSN"`
-	}
-	DBSetup struct {
-		Migrate bool `default:"false" usage:"Migrate database from SQL queries."`
+	Env      Env    `default:"development" usage:"Environment"`
+	HTTPPort int    `default:"8086" usage:"Server port"`
+	DebugKey string `default:"" usage:"Debug Key for more information"`
+	DBSetup  struct {
+		DSN     string `default:"sqlite3::memory:" usage:"Database SQL DSN"`
+		Migrate bool   `default:"false" usage:"Migrate database from SQL queries."`
 	}
 	Logging struct {
 		Level       slog.Level `default:"INFO" usage:"Logging level"`

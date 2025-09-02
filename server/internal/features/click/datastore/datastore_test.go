@@ -19,7 +19,7 @@ func createCfg(_ *do.Injector) (*config.Config, error) {
 	if err != nil {
 		return nil, errors.Trace(err)
 	}
-	cfg.SQLTarget.Default = "sqlite3::memory:"
+	cfg.DBSetup.DSN = "sqlite3::memory:"
 	cfg.DBSetup.Migrate = true
 	return cfg, nil
 }
