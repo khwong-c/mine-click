@@ -3,10 +3,10 @@ package drivers
 import (
 	"log/slog"
 
+	"github.com/glebarez/sqlite"
 	"github.com/juju/errors"
 	"github.com/samber/do"
 	"github.com/xo/dburl"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	gormLogger "gorm.io/gorm/logger"
 
