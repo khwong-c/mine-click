@@ -24,3 +24,4 @@ services:
       - ./data:/data:rw
     environment:
       - DB_SETUP_MIGRATE=true
+      - DB_SETUP_DSN=sqlite3:/data/click.db

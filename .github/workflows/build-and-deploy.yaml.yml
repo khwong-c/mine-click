@@ -122,7 +122,8 @@ jobs:
             mv ./incoming/ci/docker-compose.yaml .
             mv ./incoming/ci/nginx.conf nginx/conf/
             rm -rf ./incoming
-            docker pull "${{ needs.build-backend.outputs.image_name }}"            
+            docker pull "${{ needs.build-backend.outputs.image_name }}"
+            docker image prune -f
             docker compose up --force-recreate -d
 
       - uses: actions/deploy-pages@v4
