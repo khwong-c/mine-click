@@ -17,6 +17,7 @@ type errorMessage struct {
 }
 type detailedErrorMessage struct {
 	errorMessage
+	Trace string `json:"trace"`
 	Stack string `json:"stack"`
 }
 
@@ -77,7 +78,7 @@ func handleErr(
 		return
 	// Other unknown errors
 	default:
-		handleInternalErr(err, cfg, renderer, logger.With("panic_stack", string(debug.Stack())), w, r)
+		handleInternalErr(err, cfg, renderer, logger, w, r)
 		return
 	}
 }
@@ -106,8 +107,8 @@ func handleInternalErr(
 	}
 
 	// Put the error in the log
-	msg, stack := err.Error(), errors.ErrorStack(err)
-	logger.Error(msg, "stack", stack)
+	msg, trace := err.Error(), errors.ErrorStack(err)
+	logger.Error(msg, "stack", string(debug.Stack()), "trace", trace)
 
 	// Render the error to the client.
 	if !debugging {
@@ -129,7 +130,8 @@ func handleInternalErr(
 				Error:   ErrorTypeInternalError,
 				Message: msg,
 			},
-			Stack: stack,
+			Stack: string(debug.Stack()),
+			Trace: trace,
 		},
 	)
 }
