@@ -20,7 +20,6 @@ services:
 
   mine-click:
     image: ghcr.io/khwong-c/mine-click:main
-    restart: always
     volumes:
       - ./data:/data:rw
     environment:
