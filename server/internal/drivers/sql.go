@@ -59,24 +59,12 @@ func createDialector(connStr string) (gorm.Dialector, SQLType, error) {
 	}
 }
 
-func DialSQL(injector *do.Injector, target string) (SQL, error) {
+func DialSQL(injector *do.Injector) (SQL, error) {
 	cfg := di.InvokeOrProvide(injector, config.LoadConfig)
-	logger := di.InvokeOrProvide(injector, log.SetupLogger).New("sql").With("target", target)
+	logger := di.InvokeOrProvide(injector, log.SetupLogger).New("sql")
 	dialector, dbType, err := createDialector(cfg.SQLTarget.Default)
 	if err != nil {
 		return nil, errors.Trace(err)
-	}
-
-	var logLevel gormLogger.LogLevel
-	switch cfg.Logging.Level {
-	case slog.LevelDebug:
-		logLevel = gormLogger.Info
-	case slog.LevelInfo:
-		logLevel = gormLogger.Warn
-	case slog.LevelWarn:
-		logLevel = gormLogger.Warn
-	case slog.LevelError:
-		logLevel = gormLogger.Error
 	}
 
 	const slowStatementReportingThreshold = 200
@@ -87,7 +75,6 @@ func DialSQL(injector *do.Injector, target string) (SQL, error) {
 			Colorful:                  false,
 			IgnoreRecordNotFoundError: true,
 			ParameterizedQueries:      true,
-			LogLevel:                  logLevel,
 		}),
 	})
 	if err != nil {
