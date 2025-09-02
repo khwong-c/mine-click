@@ -9,7 +9,6 @@ import (
 	"github.com/samber/lo"
 )
 
-const syncPeriod = 5 * time.Second
 const syncTimeout = 1 * time.Second
 
 var errFailureAfterWrite = errors.New("Read Failure After Write")
@@ -57,13 +56,14 @@ func (c *Click) logSyncErr(err error) {
 }
 
 func (c *Click) syncWorker() {
-	ticker := time.Tick(syncPeriod)
+	ticker := time.Tick(c.syncPeriod)
 	for {
 		select {
 		case <-ticker:
 			if err := c.syncClicks(context.Background()); err != nil {
 				c.logSyncErr(err)
 			}
+			slog.Info("Sync Click Counts")
 		case <-c.shutdownSignal:
 			return
 		}
