@@ -8,6 +8,7 @@ require (
 	github.com/cristalhq/aconfig/aconfigyaml v0.17.1
 	github.com/dotse/slug v0.1.1
 	github.com/go-chi/chi/v5 v5.2.3
+	github.com/google/uuid v1.6.0
 	github.com/juju/errors v1.0.0
 	github.com/samber/do v1.6.0
 	github.com/samber/slog-multi v1.4.1
