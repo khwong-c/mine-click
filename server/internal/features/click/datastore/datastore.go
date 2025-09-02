@@ -25,7 +25,7 @@ type clickStore struct {
 func (c *clickStore) GetClicks(ctx context.Context) (*ClickRecord, error) {
 	var clicks ClickRecord
 	if err := c.db.WithContext(ctx).Model(&ClickRecord{}).
-		Order("id desc").Find(&clicks).Limit(1).Error; err != nil {
+		Order("id desc").Limit(1).Find(&clicks).Error; err != nil {
 		return nil, errors.Trace(err)
 	}
 	return &clicks, nil

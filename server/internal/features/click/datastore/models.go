@@ -11,7 +11,7 @@ import (
 
 type JSONMap map[string]int
 
-// Scan scans value into Jsonb, implements sql.Scanner interface
+// Scan scans value into Jsonb, implements sql.Scanner interface.
 func (j *JSONMap) Scan(value interface{}) error {
 	bytes, ok := value.([]byte)
 	if !ok {
@@ -24,9 +24,9 @@ func (j *JSONMap) Scan(value interface{}) error {
 	return errors.Trace(err)
 }
 
-// Value returns json value, implement driver.Valuer interface
+// Value returns json value, implement driver.Valuer interface.
 func (j JSONMap) Value() (driver.Value, error) {
-	if j == nil || len(j) == 0 {
+	if len(j) == 0 {
 		return []byte("{}"), nil
 	}
 	return json.Marshal(j)

@@ -14,6 +14,7 @@ import (
 	"github.com/unrolled/render"
 
 	"github.com/khwong-c/mine-click/server/internal/config"
+	"github.com/khwong-c/mine-click/server/internal/features/click"
 	"github.com/khwong-c/mine-click/server/internal/server/middlewares"
 	"github.com/khwong-c/mine-click/server/internal/tooling/di"
 	"github.com/khwong-c/mine-click/server/internal/tooling/log"
@@ -26,6 +27,8 @@ type Server struct {
 	config *config.Config
 	logger *slog.Logger
 	render *render.Render
+
+	clickSvc *click.Click
 }
 
 func (s *Server) Serve() {
@@ -62,6 +65,7 @@ func CreateServer(injector *do.Injector) (*Server, error) {
 		config:   cfg,
 		logger:   di.InvokeOrProvide(injector, log.SetupLogger).New("server"),
 		render:   render.New(),
+		clickSvc: di.InvokeOrProvide(injector, click.NewClick),
 		Server: &http.Server{
 			Addr:              fmt.Sprintf(":%d", cfg.HTTPPort),
 			ReadTimeout:       readTimeout,
@@ -77,13 +81,25 @@ func CreateServer(injector *do.Injector) (*Server, error) {
 }
 
 func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
-	// TODO: How to specify the server we want? Is it DI / Compile time config?
 	r := chi.NewMux()
 	r.Use(middlewares.PanicRecovery(s.config, s.render, s.logger.With("panic", true)))
 	r.Use(chiMiddleware.Heartbeat("/health"))
-	r.Get("/", func(w http.ResponseWriter, _ *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		_, _ = w.Write([]byte("OK"))
+
+	r.Get("/clicks", func(w http.ResponseWriter, _ *http.Request) {
+		type response struct {
+			Clicks map[string]int `json:"clicks"`
+		}
+		_ = s.render.JSON(w, http.StatusOK, response{
+			Clicks: s.clickSvc.GetClicks(),
+		})
+	})
+	r.Post("/click/{type}", func(w http.ResponseWriter, r *http.Request) {
+		type resp struct {
+			Success bool `json:"success"`
+		}
+		t := chi.URLParam(r, "type")
+		s.clickSvc.AddClick(t)
+		_ = s.render.JSON(w, http.StatusOK, resp{Success: true})
 	})
 
 	return r, nil

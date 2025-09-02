@@ -69,7 +69,8 @@ func DialSQL(injector *do.Injector) (SQL, error) {
 
 	const slowStatementReportingThreshold = 200
 	db, err := gorm.Open(dialector, &gorm.Config{
-		PrepareStmt: true,
+		PrepareStmt:                              true,
+		DisableForeignKeyConstraintWhenMigrating: true,
 		Logger: gormLogger.NewSlogLogger(logger, gormLogger.Config{
 			SlowThreshold:             slowStatementReportingThreshold,
 			Colorful:                  false,

@@ -39,7 +39,7 @@ type Config struct {
 
 func DefaultLoaderConfig() aconfig.Config {
 	return aconfig.Config{
-		SkipEnv:   true,
+		SkipEnv:   false,
 		SkipFlags: false,
 		FileFlag:  "config",
 		Files:     []string{"config.yaml"},

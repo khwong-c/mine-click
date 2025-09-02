@@ -3,7 +3,6 @@ package datastore
 import (
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/juju/errors"
 	"github.com/samber/do"
 	"github.com/stretchr/testify/assert"
@@ -22,11 +21,6 @@ func createCfg(_ *do.Injector) (*config.Config, error) {
 	cfg.DBSetup.DSN = "sqlite3::memory:"
 	cfg.DBSetup.Migrate = true
 	return cfg, nil
-}
-
-type Record struct {
-	ID      uuid.UUID `gorm:"type:text;primary_key;sort:desc"`
-	Content JSONMap   `gorm:"type:json"`
 }
 
 func TestClickStore_Sanity(t *testing.T) {
