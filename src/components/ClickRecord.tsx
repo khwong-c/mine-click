@@ -14,10 +14,9 @@ export const ClickRecord = (props: { clickRecord: { local: TileRecord, global: T
         }}
     >
         {Object.entries(clickRecord.local).map(([key, value]) => (
-            value != 0 ?
                 <div key={key}>
-                    {key}: {clickRecord.local[key] ?? 0} / {clickRecord.global[key] ?? 0}
-                </div> : <></>
+                    {key}: {value} / {clickRecord.global[key] ?? 0}
+                </div>
         ))}
     </div>;
 }

@@ -32,11 +32,11 @@ const ClickRecProviders = (props: React.PropsWithChildren) => {
         }, {});
 
     // Tile Record Logic
-    const [tileRecord, updateTileRecord] = useLocalStorage<TileRecord>("TileRecord-20250903", {});
+    const [localTileRecord, updateTileRecord] = useLocalStorage<TileRecord>("TileRecord-20250903", {});
     const addTileToLocalRecord = (newTile: string) => {
         updateTileRecord({
-            ...tileRecord,
-            [newTile]: (tileRecord[newTile] ?? 0) + 1,
+            ...localTileRecord,
+            [newTile]: (localTileRecord[newTile] ?? 0) + 1,
         });
     }
 
@@ -79,10 +79,13 @@ const ClickRecProviders = (props: React.PropsWithChildren) => {
         )
     }
     useInterval(fetchClicks, interval);
-
+    const localWithZeros = {
+        ...Object.fromEntries(Object.keys(globalClickRec).map((k) => [k, 0])),
+        ...localTileRecord,
+    };
     return (
         <ClickRecContext.Provider value={{
-            local: tileRecord,
+            local: localWithZeros,
             global: globalClickRec,
         }}>
             <ClickRecControllerContext.Provider value={clickRecController}>
