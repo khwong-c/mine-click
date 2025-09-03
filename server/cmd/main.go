@@ -21,5 +21,5 @@ func main() {
 		logger.Error("Injector shutdown error", "err", err)
 		os.Exit(1)
 	}
-	logger.Error("System shutdown Gracefully")
+	logger.Info("System shutdown Gracefully")
 }
