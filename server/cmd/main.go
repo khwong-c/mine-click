@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"syscall"
 
 	"github.com/khwong-c/mine-click/server/internal/server"
 	"github.com/khwong-c/mine-click/server/internal/tooling/di"
@@ -15,8 +16,10 @@ func main() {
 	logger.Info("Server created", "addr", svr.Addr)
 
 	svr.Serve()
-	err := injector.ShutdownOnSignals(os.Interrupt, os.Kill)
+	err := injector.ShutdownOnSignals(os.Interrupt, os.Kill, syscall.SIGTERM)
 	if err != nil {
 		logger.Error("Injector shutdown error", "err", err)
+		os.Exit(1)
 	}
+	logger.Error("System shutdown Gracefully")
 }
