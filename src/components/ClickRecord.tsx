@@ -1,7 +1,7 @@
 import {TileRecord} from "../type.ts";
 
-export const ClickRecord = (props: { tileRecord: TileRecord}) => {
-    const {tileRecord} = props;
+export const ClickRecord = (props: { clickRecord: { local: TileRecord, global: TileRecord }}) => {
+    const {clickRecord} = props;
     return <div
         style={{
             position: "absolute",
@@ -13,10 +13,10 @@ export const ClickRecord = (props: { tileRecord: TileRecord}) => {
             zIndex: 1000,
         }}
     >
-        {Object.entries(tileRecord).map(([key, value]) => (
+        {Object.entries(clickRecord.local).map(([key, value]) => (
             value != 0 ?
                 <div key={key}>
-                    {key}: {value}
+                    {key}: {clickRecord.local[key] ?? 0} / {clickRecord.global[key] ?? 0}
                 </div> : <></>
         ))}
     </div>;
