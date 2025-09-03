@@ -19,6 +19,11 @@ import (
 
 var PermittedClickType = lo.Keyify([]string{
 	"Stone",
+	"Coal",
+	"Iron",
+	"Gold",
+	"Diamond",
+	"Redstone",
 })
 
 type Click struct {
