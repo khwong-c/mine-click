@@ -32,7 +32,7 @@ const ClickRecProviders = (props: React.PropsWithChildren) => {
         }, {});
 
     // Tile Record Logic
-    const [tileRecord, updateTileRecord] = useLocalStorage<TileRecord>("TileRecord", {});
+    const [tileRecord, updateTileRecord] = useLocalStorage<TileRecord>("TileRecord-20250903", {});
     const addTileToLocalRecord = (newTile: string) => {
         updateTileRecord({
             ...tileRecord,
