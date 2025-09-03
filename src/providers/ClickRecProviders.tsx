@@ -10,7 +10,7 @@ import {useInterval, useLocalStorage} from "usehooks-ts";
 const API_URL = "https://be.mine-click.coolpay64.net";
 const FETCH_CLICK_URL = `${API_URL}/clicks`;
 const SUBMIT_CLICK_URL = `${API_URL}/click`;
-const FETCH_INTERVAL = 60 * 1000; // 1 minutes
+const FETCH_INTERVAL = 2 * 1000; // 2 seconds
 
 
 const ClickRecProviders = (props: React.PropsWithChildren) => {
