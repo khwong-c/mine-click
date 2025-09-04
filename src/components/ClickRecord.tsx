@@ -37,6 +37,9 @@ export const ClickRecord = (props: {
                             backgroundColor: [inAnimation.has(key)? "#a16207" : "#164e63", "#164e63"],
                             color: [inAnimation.has(key)? "#fef08a" : "#bfdbfe", "#bfdbfe"]
                         }}
+                        transition={{
+                            ease: "easeOut"
+                        }}
                         onAnimationComplete={()=>{
                             inAnimation.delete(key);
                             setInAnimation(inAnimation);
