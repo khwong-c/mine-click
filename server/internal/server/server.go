@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
+	"github.com/gorilla/websocket"
 	"github.com/juju/errors"
 	"github.com/samber/do"
 	"github.com/unrolled/render"
@@ -24,10 +25,11 @@ type Server struct {
 	*http.Server
 	injector *do.Injector
 
-	config *config.Config
-	logger *slog.Logger
-	render *render.Render
-	hub    *SessionHub
+	config     *config.Config
+	logger     *slog.Logger
+	render     *render.Render
+	wsUpgrader *websocket.Upgrader
+	hub        *SessionHub
 
 	clickSvc *click.Click
 }
@@ -62,6 +64,7 @@ func CreateServer(injector *do.Injector) (*Server, error) {
 		readTimeout       = 2 * time.Second
 		readHeaderTimeout = 1 * time.Second
 		writeTimeout      = 10 * time.Second
+		wsBufferSize      = 1024
 	)
 	cfg := di.InvokeOrProvide(injector, config.LoadConfig)
 	server := &Server{
@@ -71,6 +74,13 @@ func CreateServer(injector *do.Injector) (*Server, error) {
 		render:   render.New(),
 		hub:      NewSessionHub(),
 		clickSvc: di.InvokeOrProvide(injector, click.NewClick),
+		wsUpgrader: &websocket.Upgrader{
+			ReadBufferSize:  wsBufferSize,
+			WriteBufferSize: wsBufferSize,
+			CheckOrigin: func(*http.Request) bool {
+				return true
+			},
+		},
 		Server: &http.Server{
 			Addr:              fmt.Sprintf(":%d", cfg.HTTPPort),
 			ReadTimeout:       readTimeout,
@@ -105,6 +115,20 @@ func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
 		t := chi.URLParam(r, "type")
 		s.clickSvc.AddClick(t)
 		_ = s.render.JSON(w, http.StatusOK, resp{Success: true})
+	})
+
+	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {
+		conn, err := s.wsUpgrader.Upgrade(w, r, nil)
+		if err != nil {
+			s.logger.Error("Failed to upgrade Session", "error", err, "trace", errors.ErrorStack(err))
+			return
+		}
+		session := s.NewWSSession(conn)
+		session.SendMsg(map[string]string{
+			"fugu": "swim",
+		})
+		<-time.After(time.Second)
+		s.hub.Unregister(session)
 	})
 
 	return r, nil
