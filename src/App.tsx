@@ -25,6 +25,7 @@ export function App() {
     const clickRecController = useClickRecController();
     const gameState = useGameState();
     const gameStateController = useGameStateController();
+    const [lastClicked, setLastClicked] = useState("");
 
     // Sound
     const sound = useSoundContext()
@@ -42,6 +43,7 @@ export function App() {
             const newTile = TileNames[Math.floor(Math.random() * TileTypeCount)];
             clickRecController({command: "add", tileType: newTile});
             gameStateController({command: "add", tileType: newTile});
+            setLastClicked(newTile);
             // Try to trigger fever mode
             if (!gameState.feverMode && Math.random() < feverChance) {
                 gameStateController({command: "startFever"});
@@ -69,7 +71,7 @@ export function App() {
             backgroundRepeat: "no-repeat",
         }}
     >
-        <Title clickRecord={clickRecord}/>
+        <Title clickRecord={clickRecord} lastClicked={lastClicked}/>
         <div
             className="absolute w-fit h-fit z-20"
             style={{

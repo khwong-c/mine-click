@@ -6,9 +6,10 @@ import {type TileRecord} from "../type.ts";
 export function Title(props: {
     clickRecord: {
         local: TileRecord, global: TileRecord,
-    }
+    },
+    lastClicked: string,
 }) {
-    const {clickRecord} = props;
+    const {clickRecord, lastClicked} = props;
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
     return <div
         className="w-screen h-fit p-1 absolute"
@@ -23,7 +24,7 @@ export function Title(props: {
                 draggable="false"/>
         </center>
         <div className="w-full flex justify-end">
-            <ClickRecord clickRecord={clickRecord}/>
+            <ClickRecord clickRecord={clickRecord} lastClicked={lastClicked}/>
         </div>
 
     </div>;
