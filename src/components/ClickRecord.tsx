@@ -28,8 +28,8 @@ export const ClickRecord = (props: {
                             color: [key == lastClicked ? "#fef08a" : "#bfdbfe", "#bfdbfe"]
                         }}
                     >
-                        <div className="items-center justify-between"><img src={TilePics[key]}
-                                                                           className="rounded-2xl size-8"/>
+                        <div className="items-center justify-between">
+                            <img src={TilePics[key]} className={`rounded-2xl ${isPhone ? "size-6" : "size-8"}`}/>
                         </div>
                         <div className="items-center">Yours: {value} /
                             Global: {clickRecord.global[key] ?? 0}</div>
