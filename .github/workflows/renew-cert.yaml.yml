@@ -1,0 +1,22 @@
+name: Renew SSL Cert
+on:
+  schedule:
+    - cron: "0 0 * * 1"  # Update Cert every Monday 00:00
+  workflow_dispatch:
+jobs:
+  renew-cert:
+    runs-on: ubuntu-latest
+    name: Update SSL Cert
+    concurrency:
+      group: deployment  # Not clashes with on-going Deployment
+    steps:
+      - name: Update Cert and Restart Service
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
+          script: |
+            docker compose run --rm  certbot certonly -n --webroot --webroot-path /var/www/certbot/ -d ${{ secrets.SSH_HOST }} 
+            docker compose up --force-recreate -d
