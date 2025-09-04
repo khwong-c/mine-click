@@ -10,6 +10,7 @@ require (
 	github.com/glebarez/sqlite v1.11.0
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/juju/errors v1.0.0
 	github.com/khwong-c/httptestclient v0.1.1
 	github.com/samber/do v1.6.0
@@ -18,6 +19,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	github.com/unrolled/render v1.7.0
 	github.com/xo/dburl v0.23.8
+	golang.org/x/time v0.12.0
 	gorm.io/gorm v1.30.2
 )
 

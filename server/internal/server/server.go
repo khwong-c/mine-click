@@ -27,6 +27,7 @@ type Server struct {
 	config *config.Config
 	logger *slog.Logger
 	render *render.Render
+	hub    *SessionHub
 
 	clickSvc *click.Click
 }
@@ -44,6 +45,9 @@ func (s *Server) Shutdown() error {
 	const shutdownDuration = 5 * time.Second
 	ctx, cancel := context.WithTimeout(context.Background(), shutdownDuration)
 	defer cancel()
+	for session := range s.hub.sessions {
+		s.hub.Unregister(session)
+	}
 	// Stop Listening for new connections.
 	if err := s.Server.Shutdown(ctx); err != nil {
 		s.logger.Error("Server shutdown error", "err", err)
@@ -65,6 +69,7 @@ func CreateServer(injector *do.Injector) (*Server, error) {
 		config:   cfg,
 		logger:   di.InvokeOrProvide(injector, log.SetupLogger).New("server"),
 		render:   render.New(),
+		hub:      NewSessionHub(),
 		clickSvc: di.InvokeOrProvide(injector, click.NewClick),
 		Server: &http.Server{
 			Addr:              fmt.Sprintf(":%d", cfg.HTTPPort),
