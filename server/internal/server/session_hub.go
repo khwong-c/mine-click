@@ -33,6 +33,11 @@ func (h *SessionHub) Unregister(s *WSSession) {
 }
 
 func (h *SessionHub) Broadcast(data any) error {
+	// Skip Broadcasting if no session is connected.
+	if len(h.sessions) == 0 {
+		return nil
+	}
+
 	raw, err := json.Marshal(data)
 	if err != nil {
 		return errors.Trace(err)

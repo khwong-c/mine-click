@@ -35,6 +35,7 @@ type Server struct {
 }
 
 func (s *Server) Serve() {
+	go s.reportClicks()
 	go func() {
 		err := s.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -123,12 +124,7 @@ func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
 			s.logger.Error("Failed to upgrade Session", "error", err, "trace", errors.ErrorStack(err))
 			return
 		}
-		session := s.NewWSSession(r.Context(), conn)
-		session.SendMsg(map[string]string{
-			"fugu": "swim",
-		})
-		<-time.After(time.Second)
-		s.hub.Unregister(session)
+		s.NewWSSession(r.Context(), conn)
 	})
 
 	return r, nil
