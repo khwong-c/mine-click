@@ -2,6 +2,7 @@ import {TileRecord} from "../type.ts";
 import {TilePics} from "../tileTypes.ts";
 import {useMediaQuery} from "usehooks-ts";
 import {motion} from "motion/react";
+import {useEffect, useState} from "react";
 
 export const ClickRecord = (props: {
     clickRecord: { local: TileRecord, global: TileRecord },
@@ -9,6 +10,15 @@ export const ClickRecord = (props: {
 }) => {
     const {clickRecord, lastClicked} = props;
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
+    const [inAnimation, setInAnimation] = useState(new Set());
+    useEffect(() => {
+        if (inAnimation.has(lastClicked)){
+            inAnimation.delete(lastClicked);
+        }
+        inAnimation.add(lastClicked);
+        setInAnimation(inAnimation);
+    },[lastClicked, inAnimation]);
+
     return <div
         className={`${isPhone ? "w-screen" : "w-80"} px-2 py-0`}
         style={{
@@ -24,8 +34,12 @@ export const ClickRecord = (props: {
                     <motion.div
                         className="rounded-2xl m-1 py-0.5 pl-4 pr-8 flex bg-cyan-900 text-blue-200 items-center justify-start w-full"
                         animate={{
-                            backgroundColor: [key == lastClicked ? "#a16207" : "#164e63", "#164e63"],
-                            color: [key == lastClicked ? "#fef08a" : "#bfdbfe", "#bfdbfe"]
+                            backgroundColor: [inAnimation.has(key)? "#a16207" : "#164e63", "#164e63"],
+                            color: [inAnimation.has(key)? "#fef08a" : "#bfdbfe", "#bfdbfe"]
+                        }}
+                        onAnimationComplete={()=>{
+                            inAnimation.delete(key);
+                            setInAnimation(inAnimation);
                         }}
                     >
                         <div className="items-center justify-between">
