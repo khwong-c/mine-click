@@ -56,6 +56,7 @@ func (s *WSSession) writeLoop() {
 	pingTicker := time.NewTicker(pingInterval)
 	defer func() {
 		pingTicker.Stop()
+		s.hub.Unregister(s)
 		_ = s.wsConn.Close()
 	}()
 	for {
@@ -89,6 +90,7 @@ func (s *WSSession) writeLoop() {
 
 func (s *WSSession) readLoop() {
 	defer func() {
+		s.hub.Unregister(s)
 		_ = s.wsConn.Close()
 	}()
 	s.wsConn.SetReadLimit(maxMessageSize)
@@ -99,6 +101,9 @@ func (s *WSSession) readLoop() {
 	for {
 		_, message, err := s.wsConn.ReadMessage()
 		if err != nil {
+			if websocket.IsCloseError(err, websocket.CloseNormalClosure) {
+				return
+			}
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				s.logger.Error("Read Error", "error", err, "trace", errors.ErrorStack(err))
 			}
