@@ -123,7 +123,7 @@ func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
 			s.logger.Error("Failed to upgrade Session", "error", err, "trace", errors.ErrorStack(err))
 			return
 		}
-		session := s.NewWSSession(conn)
+		session := s.NewWSSession(r.Context(), conn)
 		session.SendMsg(map[string]string{
 			"fugu": "swim",
 		})

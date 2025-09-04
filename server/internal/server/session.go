@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"log/slog"
 	"time"
@@ -22,6 +23,7 @@ const (
 )
 
 type WSSession struct {
+	ctx      context.Context
 	wsConn   *websocket.Conn
 	server   *Server
 	hub      *SessionHub
@@ -30,8 +32,9 @@ type WSSession struct {
 	rLimiter *rate.Limiter
 }
 
-func (s *Server) NewWSSession(wsConn *websocket.Conn) *WSSession {
+func (s *Server) NewWSSession(ctx context.Context, wsConn *websocket.Conn) *WSSession {
 	newSession := &WSSession{
+		ctx:      ctx,
 		wsConn:   wsConn,
 		server:   s,
 		hub:      s.hub,
