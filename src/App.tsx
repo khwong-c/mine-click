@@ -7,7 +7,6 @@ import {TileNames, TileTypeCount} from "./tileTypes";
 
 import tunnelBG from "./images/tunnel.webp";
 import {FeverPickAxe} from "./components/FeverPickAxe.tsx";
-import {ClickRecord} from "./components/ClickRecord.tsx";
 import {Title} from "./components/Title.tsx";
 import {
     useClickRec,
@@ -70,8 +69,7 @@ export function App() {
             backgroundRepeat: "no-repeat",
         }}
     >
-        <Title/>
-        <ClickRecord clickRecord={clickRecord}/>
+        <Title clickRecord={clickRecord}/>
         <div
             className="absolute w-fit h-fit z-20"
             style={{
