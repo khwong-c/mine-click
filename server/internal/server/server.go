@@ -110,12 +110,9 @@ func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
 		})
 	})
 	r.Post("/click/{type}", func(w http.ResponseWriter, r *http.Request) {
-		type resp struct {
-			Success bool `json:"success"`
-		}
 		t := chi.URLParam(r, "type")
-		s.clickSvc.AddClick(t)
-		_ = s.render.JSON(w, http.StatusOK, resp{Success: true})
+		actualTile := s.clickSvc.AddClick(&t)
+		_ = s.render.JSON(w, http.StatusOK, newClickResp{Tile: actualTile})
 	})
 
 	r.Get("/ws", func(w http.ResponseWriter, r *http.Request) {

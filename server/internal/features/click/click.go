@@ -17,14 +17,15 @@ import (
 	"github.com/khwong-c/mine-click/server/internal/tooling/di"
 )
 
-var PermittedClickType = lo.Keyify([]string{
+var PermittedClickTypeSlice = []string{
 	"Stone",
 	"Coal",
 	"Iron",
 	"Gold",
 	"Diamond",
 	"Redstone",
-})
+}
+var PermittedClickType = lo.Keyify(PermittedClickTypeSlice)
 
 type Click struct {
 	*sync.RWMutex
@@ -43,16 +44,28 @@ type Click struct {
 func (c *Click) GetClicks() map[string]int {
 	c.RLock()
 	defer c.RUnlock()
-	return lo.MapEntries(PermittedClickType, func(k string, _ struct{}) (string, int) {
+	return lo.SliceToMap(PermittedClickTypeSlice, func(k string) (string, int) {
 		return k, int(c.clicksInMem[k].Load()) + c.clickFromStore[k]
 	})
 }
 
-func (c *Click) AddClick(clickType string) {
-	if _, ok := PermittedClickType[clickType]; !ok {
-		return
+func (c *Click) AddClick(clickType *string) *string {
+	if clickType == nil {
+		clickType = c.generateClick()
+		c.clicksInMem[*clickType].Add(1)
+		return clickType
 	}
-	c.clicksInMem[clickType].Add(1)
+
+	if _, ok := PermittedClickType[*clickType]; !ok {
+		return nil
+	}
+	c.clicksInMem[*clickType].Add(1)
+	return clickType
+}
+
+func (c *Click) generateClick() *string {
+	newTile := lo.Sample(PermittedClickTypeSlice)
+	return &newTile
 }
 
 func (c *Click) Shutdown() error {
@@ -73,7 +86,7 @@ func NewClick(injector *do.Injector) (*Click, error) {
 		RWMutex:    &sync.RWMutex{},
 		clickQueue: make(chan string, clickQueueSize),
 		clicksInMem: lo.SliceToMap(
-			lo.Keys(PermittedClickType), func(k string) (string, *atomic.Int64) {
+			PermittedClickTypeSlice, func(k string) (string, *atomic.Int64) {
 				return k, &atomic.Int64{}
 			},
 		),

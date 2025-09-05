@@ -8,7 +8,6 @@ import (
 	"github.com/juju/errors"
 	"github.com/khwong-c/httptestclient"
 	"github.com/samber/do"
-	"github.com/samber/lo"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/khwong-c/mine-click/server/internal/config"
@@ -52,7 +51,7 @@ func TestClickTestSuite(t *testing.T) {
 
 func (s *ClickTestSuite) TestClick_Persistent() {
 	const clickCount = 10
-	validClickType := lo.Keys(click.PermittedClickType)[0]
+	validClickType := click.PermittedClickTypeSlice[0]
 	ctx := s.T().Context()
 	client := httptestclient.New(s.server.Handler)
 	for i := 0; i < clickCount; i++ {

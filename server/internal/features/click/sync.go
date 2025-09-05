@@ -23,7 +23,7 @@ func (c *Click) syncClicks(ctx context.Context) error {
 		return errors.Trace(err)
 	}
 
-	validTypes := lo.Uniq(append(lo.Keys(clickRec.Clicks), lo.Keys(PermittedClickType)...))
+	validTypes := lo.Uniq(append(lo.Keys(clickRec.Clicks), PermittedClickTypeSlice...))
 	sum := lo.SliceToMap(validTypes, func(k string) (string, int) {
 		return k, clickRec.Clicks[k] + int(c.clicksInMem[k].Load())
 	})
