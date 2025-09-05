@@ -42,7 +42,7 @@ export default function WSProvider(props: React.PropsWithChildren) {
                     );
                 }
             },
-            shouldReconnect: () => false,
+            shouldReconnect: () => true,
             disableJson: false,
             heartbeat: {
                 returnMessage: "pong",
