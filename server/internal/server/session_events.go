@@ -1,8 +1,22 @@
 package server
 
+type EventType string
+
 type ReceivePacket struct {
-	Type string `json:"type"`
+	Type EventType `json:"type"`
+	Tile *string   `json:"tile,omitempty"`
 }
 
-func (s *WSSession) HandleInput(ReceivePacket) {
+const (
+	EventClick EventType = "click"
+)
+
+func (s *WSSession) HandleInput(pkt ReceivePacket) {
+	switch pkt.Type {
+	case EventClick:
+		newTile := s.server.clickSvc.AddClick(pkt.Tile)
+		s.SendMsg(newClickResp{Tile: newTile})
+	default:
+		return
+	}
 }

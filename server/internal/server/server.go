@@ -35,7 +35,6 @@ type Server struct {
 }
 
 func (s *Server) Serve() {
-	go s.reportClicks()
 	go func() {
 		err := s.ListenAndServe()
 		if err != nil && !errors.Is(err, http.ErrServerClosed) {
@@ -93,6 +92,7 @@ func CreateServer(injector *do.Injector) (*Server, error) {
 		return nil, errors.Trace(err)
 	}
 	server.logger.Info("Server created", "addr", server.Addr)
+	go server.reportClicks()
 	return server, nil
 }
 

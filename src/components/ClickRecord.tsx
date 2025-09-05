@@ -25,7 +25,7 @@ export const ClickRecord = (props: {
             fontSize: "14px",
             color: "#555",
             userSelect: "none",
-            zIndex: 1000,
+            zIndex: 10,
         }}
     >
         <ul>
