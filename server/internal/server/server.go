@@ -121,7 +121,8 @@ func (s *Server) createRoute() (http.Handler, error) { //nolint:unparam
 			s.logger.Error("Failed to upgrade Session", "error", err, "trace", errors.ErrorStack(err))
 			return
 		}
-		s.NewWSSession(r.Context(), conn)
+		sess := s.NewWSSession(r.Context(), conn)
+		sess.SendMsg(&ClickMsg{Clicks: s.clickSvc.GetClicks()})
 	})
 
 	return r, nil
