@@ -1,8 +1,9 @@
-import {useReducer, useState} from "react";
+import {useCallback, useEffect, useReducer, useState} from "react";
 
 import {GameState, GameStateContext, GameStateDispatchContext, GameStateDispatchPayload} from "./gameStateContext.ts";
 import {TileNames} from "../tileTypes.ts";
 import {useInterval} from "usehooks-ts";
+import {useWebSocket} from "./wsContext.ts";
 
 const feverModeDuration = 10000; // ms
 
@@ -11,7 +12,7 @@ const GameStateProvider = (props: React.PropsWithChildren) => {
 
     // Tiles Generation Logic
     const [curID, setCurID] = useState(0);
-    const getNewTileProp = (tileType: string) => {
+    const getNewTileProp = useCallback((tileType: string) => {
         const result = {
             id: curID,
             tileProp: {
@@ -24,7 +25,7 @@ const GameStateProvider = (props: React.PropsWithChildren) => {
         }
         setCurID(curID + 1);
         return result
-    }
+    },[curID])
 
     const [gameState, gameStateDispatch] = useReducer(
         (prev: GameState, payload: GameStateDispatchPayload) => {
@@ -56,6 +57,16 @@ const GameStateProvider = (props: React.PropsWithChildren) => {
     useInterval(() => {
         gameStateDispatch({command: "stopFever"});
     }, gameState.feverMode ? feverModeDuration : null);
+
+    const ws = useWebSocket();
+    useEffect(() => {
+        ws.setCallbacks({
+            id: "gameState",
+            onClick: tile => {
+                gameStateDispatch({command:"add", tileType: tile});
+            },
+        })
+    },[gameStateDispatch, ws])
 
     return (
         <GameStateContext.Provider value={gameState}>

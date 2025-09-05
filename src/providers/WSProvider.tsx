@@ -3,25 +3,23 @@ import {ReadyState} from 'react-use-websocket';
 import * as React from "react";
 import {WS_ENDPOINT} from "../config.ts";
 
-import {WSResponse, WSCallbacks, WSCallbackContext, WebSocketContext} from "./wsContext.ts"
+import {WSResponse, WSCallbacks, WebSocketContext, WSCallbackDispatch} from "./wsContext.ts"
 import {useReducer} from "react";
 
 export default function WSProvider(props: React.PropsWithChildren) {
     const {children} = props;
     const [callbacks, setCallbacks] = useReducer(
-        (cb: WSCallbacks, payload: Partial<WSCallbacks>): WSCallbacks => {
+        (cb: WSCallbacks, payload: WSCallbackDispatch): WSCallbacks => {
             if (payload?.onClick != null) {
-                cb.onClick = payload.onClick;
+                cb.onClick[payload.id] = payload.onClick;
             }
             if (payload?.onGlobalClickRecord != null) {
-                cb.onGlobalClickRecord = payload.onGlobalClickRecord;
+                cb.onGlobalClickRecord[payload.id] = payload.onGlobalClickRecord;
             }
             return cb;
         }, {
-            onGlobalClickRecord: () => {
-            },
-            onClick: () => {
-            },
+            onGlobalClickRecord: {},
+            onClick: {},
         }
     );
     const {
@@ -32,10 +30,16 @@ export default function WSProvider(props: React.PropsWithChildren) {
             onMessage: (e) => {
                 const msg = JSON.parse(e.data) as WSResponse;
                 if (msg?.tile != null) {
-                    callbacks.onClick(msg.tile)
+                    const tile = msg.tile
+                    Object.values(callbacks.onClick).forEach(
+                        (callback) => callback(tile)
+                    );
                 }
                 if (msg?.clicks != null) {
-                    callbacks.onGlobalClickRecord(msg.clicks)
+                    const clicks = msg.clicks
+                    Object.values(callbacks.onGlobalClickRecord).forEach(
+                        (callback) => callback(clicks)
+                    );
                 }
             },
             shouldReconnect: () => false,
@@ -46,26 +50,16 @@ export default function WSProvider(props: React.PropsWithChildren) {
         });
     return (
         <WebSocketContext.Provider value={{
-            sendMsg: (msg) => {
-                sendJsonMessage(msg);
-            },
+            sendMsg: sendJsonMessage,
+            setCallbacks: setCallbacks,
         }}>
-            <WSCallbackContext.Provider value={{
-                setOnClick: (cb) => {
-                    setCallbacks({onClick: cb});
-                },
-                setOnGlobalClickRecord: (cb) => {
-                    setCallbacks({onGlobalClickRecord: cb});
-                },
-            }}>
-                {readyState != ReadyState.OPEN ?
-                    <div
-                        className="w-dvw h-dvh absolute backdrop-blur-md items-center justify-center content-center z-50">
-                        <center><p className="font-extrabold text-9xl bg-emerald-900">Loading...</p></center>
-                    </div> :
-                    <></>}
-                {children}
-            </WSCallbackContext.Provider>
+            {readyState != ReadyState.OPEN ?
+                <div
+                    className="w-dvw h-dvh absolute backdrop-blur-md items-center justify-center content-center z-50">
+                    <center><p className="font-extrabold text-9xl bg-emerald-900">Loading...</p></center>
+                </div> :
+                <></>}
+            {children}
         </WebSocketContext.Provider>
     )
 }

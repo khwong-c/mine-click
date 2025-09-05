@@ -1,16 +1,15 @@
-import {useEffect, useReducer} from "react";
+import {useEffect, useReducer, type PropsWithChildren, useCallback} from "react";
 import type {TileRecord} from "../type.ts";
 import {
     ClickRecContext, ClickRecControllerContext,
     type ClickRecDispatchPayload,
 } from './clickRecContext.ts';
 import {useLocalStorage} from "usehooks-ts";
-import {useWebSocket, useWSCallBack} from "./wsContext.ts";
+import {useWebSocket} from "./wsContext.ts";
 
-const ClickRecProviders = (props: React.PropsWithChildren) => {
+const ClickRecProviders = (props: PropsWithChildren) => {
     const {children} = props;
     const ws = useWebSocket();
-    const wsCallback = useWSCallBack();
 
     const [globalClickRec, globalClickRecDispatch] = useReducer(
         (state: TileRecord, payload: ClickRecDispatchPayload) => {
@@ -30,12 +29,14 @@ const ClickRecProviders = (props: React.PropsWithChildren) => {
 
     // Tile Record Logic
     const [localTileRecord, updateTileRecord] = useLocalStorage<TileRecord>("TileRecord-20250903", {});
-    const addTileToLocalRecord = (newTile: string) => {
-        updateTileRecord({
-            ...localTileRecord,
-            [newTile]: (localTileRecord[newTile] ?? 0) + 1,
-        });
-    }
+    const addTileToLocalRecord = useCallback(
+        (newTile: string) => {
+            updateTileRecord({
+                ...localTileRecord,
+                [newTile]: (localTileRecord[newTile] ?? 0) + 1,
+            });
+        }, [localTileRecord, updateTileRecord]
+    )
 
     const clickRecController = async (payload: ClickRecDispatchPayload) => {
         switch (payload.command) {
@@ -43,7 +44,6 @@ const ClickRecProviders = (props: React.PropsWithChildren) => {
                 const type = payload.tileType ?? "";
                 addTileToLocalRecord(type);
                 globalClickRecDispatch(payload);
-                ws.sendMsg({type: "click", tile: type});
                 break;
             }
             case "set": {
@@ -55,10 +55,14 @@ const ClickRecProviders = (props: React.PropsWithChildren) => {
         }
     }
     useEffect(() => {
-        wsCallback.setOnGlobalClickRecord((rec) => {
-            globalClickRecDispatch({command: "set", newRecord: rec ?? {}});
+        ws.setCallbacks({
+            id: "clickRec",
+            onClick: addTileToLocalRecord,
+            onGlobalClickRecord: (rec) => {
+                globalClickRecDispatch({command: "set", newRecord: rec ?? {}});
+            },
         });
-    },[wsCallback, globalClickRecDispatch]);
+    }, [ws, globalClickRecDispatch, addTileToLocalRecord]);
 
     const localWithZeros = {
         ...Object.fromEntries(Object.keys(globalClickRec).map((k) => [k, 0])),

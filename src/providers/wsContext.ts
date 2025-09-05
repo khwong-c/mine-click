@@ -1,5 +1,5 @@
 import {TileRecord} from "../type.ts";
-import {createContext, useContext} from "react";
+import {createContext, useContext, type ActionDispatch} from "react";
 
 type WSRequestTypeEnum = "click"
 export type WSRequest = {
@@ -14,29 +14,28 @@ export type WSResponse = Partial<{
 }>
 
 export type WSCallbacks = {
-    onClick: (tile: string) => void,
-    onGlobalClickRecord: (rec: TileRecord) => void,
+    onClick: Record<string, (tile: string) => void>,
+    onGlobalClickRecord: Record<string, (rec: TileRecord) => void>,
 }
 
-export type WSCallbacksRegister = {
-    setOnClick: (cb: (tile: string) => void)=>void,
-    setOnGlobalClickRecord: (cb: (rec: TileRecord) => void)=>void,
+export type WSCallbackDispatch = {
+    id: string,
+    onClick?: (tile: string) => void,
+    onGlobalClickRecord?: (rec: TileRecord) => void,
 }
 
 export type WebSocketSession = {
-    sendMsg: ((msg: WSRequest) => void),
+    sendMsg: (msg: WSRequest) => void,
+    setCallbacks: ActionDispatch<[payload: WSCallbackDispatch]>
 }
 
-export const WSCallbackContext = createContext<WSCallbacksRegister>({
-    setOnClick: () => {
-    },
-    setOnGlobalClickRecord: () => {
-    },
-});
+export const WSCallbackContext = createContext<
+    ActionDispatch<[payload: WSCallbackDispatch]> | null
+>(null);
 
 export const WebSocketContext = createContext<WebSocketSession>({
     sendMsg: () => {},
+    setCallbacks: ()=> {},
 })
 
-export const useWSCallBack = () => useContext(WSCallbackContext);
 export const useWebSocket = () => useContext(WebSocketContext);

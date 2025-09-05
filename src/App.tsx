@@ -2,30 +2,27 @@ import {useState} from 'react';
 import {useMediaQuery, useInterval} from "usehooks-ts";
 import {CircleButton} from './components/CircleButton';
 import {Tile} from './components/Tile';
-import {TileNames, TileTypeCount} from "./tileTypes";
 
 
 import tunnelBG from "./images/tunnel.webp";
 import {FeverPickAxe} from "./components/FeverPickAxe.tsx";
 import {Title} from "./components/Title.tsx";
-import {
-    useClickRec,
-    useClickRecController,
-} from "./providers/clickRecContext.ts";
+import {useClickRec} from "./providers/clickRecContext.ts";
 import {useGameState, useGameStateController} from "./providers/gameStateContext.ts";
 import {useSoundContext} from "./providers/soundContext.ts";
+import {useWebSocket} from "./providers/wsContext.ts";
 
 export function App() {
     // Layout
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
     const center = isPhone ? {x: 50, y: 75} : {x: 50, y: 80};
 
+    const ws = useWebSocket();
+
     // Clicks and Display
     const clickRecord = useClickRec();
-    const clickRecController = useClickRecController();
     const gameState = useGameState();
     const gameStateController = useGameStateController();
-    const [lastClicked, setLastClicked] = useState("");
 
     // Sound
     const sound = useSoundContext()
@@ -39,12 +36,7 @@ export function App() {
     const feverChance = 0.05816;
     const onMining = async () => {
         if (hitCount + 1 >= hitBeforeDigRatio) {
-            sound.playDig();
-            const newTile = TileNames[Math.floor(Math.random() * TileTypeCount)];
-            clickRecController({command: "add", tileType: newTile});
-            gameStateController({command: "add", tileType: newTile});
-            setLastClicked(newTile);
-            // Try to trigger fever mode
+            ws.sendMsg({type: "click"});
             if (!gameState.feverMode && Math.random() < feverChance) {
                 gameStateController({command: "startFever"});
             }
@@ -71,7 +63,7 @@ export function App() {
             backgroundRepeat: "no-repeat",
         }}
     >
-        <Title clickRecord={clickRecord} lastClicked={lastClicked}/>
+        <Title clickRecord={clickRecord}/>
         <div
             className="absolute w-fit h-fit z-20"
             style={{

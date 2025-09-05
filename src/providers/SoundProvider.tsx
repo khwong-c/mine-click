@@ -1,9 +1,10 @@
-import {useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import useSound from "use-sound";
 import {SoundContext} from "./soundContext.ts";
 
 import digSounds from "../sound/dig.ogg";
 import hitSounds from "../sound/hit.ogg";
+import {useWebSocket} from "./wsContext.ts";
 
 const digSoundSegments: [number, number][] = [
     [0, 500],
@@ -38,7 +39,7 @@ const SoundProvider = (props: React.PropsWithChildren) => {
     const [playHitSound] = useSound(hitSounds, {sprite: hitSoundSegmentsMap, volume: soundVol});
 
 
-    const soundController = {
+    const soundController = useMemo(() => ({
         playDig: () => {
             playDigSound({id: String(digSoundIndex)});
             setDigSoundIndex((digSoundIndex + 1) % digSoundSegments.length);
@@ -47,7 +48,17 @@ const SoundProvider = (props: React.PropsWithChildren) => {
             playHitSound({id: String(hitSoundIndex)});
             setHitSoundIndex(Math.floor(Math.random() * hitSoundSegments.length));
         },
-    }
+    }), [digSoundIndex, hitSoundIndex, playDigSound, playHitSound]);
+
+    const ws = useWebSocket()
+    useEffect(() => {
+        ws.setCallbacks({
+            id: "sound",
+            onClick: () => {
+                soundController.playDig()
+            },
+        })
+    }, [soundController, ws])
 
     return (
         <SoundContext.Provider value={soundController}>

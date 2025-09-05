@@ -2,28 +2,39 @@ import {TileRecord} from "../type.ts";
 import {TilePics} from "../tileTypes.ts";
 import {useMediaQuery} from "usehooks-ts";
 import {motion} from "motion/react";
-import {useEffect, useState} from "react";
+import {useWebSocket} from "../providers/wsContext.ts";
+import {useEffect, useMemo, useState} from "react";
 
 export const ClickRecord = (props: {
     clickRecord: { local: TileRecord, global: TileRecord },
-    lastClicked: string,
 }) => {
-    const {clickRecord, lastClicked} = props;
+    const {clickRecord} = props;
     const isPhone = useMediaQuery("only screen and (max-width : 481px)");
-    const [inAnimation, setInAnimation] = useState(new Set());
+    const colors = useMemo(() => ({
+        hotBG: "#a16207",
+        hotFG: "#fef08a",
+        coolBG: "#164e63",
+        coolFG: "#bfdbfe",
+    }), [])
+
+    const [motionKey, setMotionKey] = useState<Record<string, string>>({});
+    const ws = useWebSocket()
+
     useEffect(() => {
-        if (inAnimation.has(lastClicked)){
-            inAnimation.delete(lastClicked);
-        }
-        inAnimation.add(lastClicked);
-        setInAnimation(inAnimation);
-    },[lastClicked, inAnimation]);
+        ws.setCallbacks({
+            id: "clickRecord",
+            onClick: (tile) => {
+                setMotionKey({
+                    ...motionKey,
+                    [tile]: `${tile}-${Math.random()}`,
+                })
+            }
+        })
+    }, [colors, motionKey, ws])
 
     return <div
         className={`${isPhone ? "w-screen" : "w-80"} px-2 py-0`}
         style={{
-            fontSize: "14px",
-            color: "#555",
             userSelect: "none",
             zIndex: 10,
         }}
@@ -33,20 +44,22 @@ export const ClickRecord = (props: {
                 <li key={key}>
                     <motion.div
                         className="rounded-2xl m-1 py-0.5 pl-4 pr-8 flex bg-cyan-900 text-blue-200 items-center justify-start w-full"
-                        animate={{
-                            backgroundColor: [inAnimation.has(key)? "#a16207" : "#164e63", "#164e63"],
-                            color: [inAnimation.has(key)? "#fef08a" : "#bfdbfe", "#bfdbfe"]
+                        initial={{
+                            backgroundColor: colors.coolBG,
+                            color: colors.coolFG,
                         }}
+                        animate={(motionKey[key] ?? null) != null ? {
+                            backgroundColor: [colors.hotBG, colors.coolBG],
+                            color: [colors.hotFG, colors.coolFG],
+                        } : false}
                         transition={{
                             ease: "easeOut"
                         }}
-                        onAnimationComplete={()=>{
-                            inAnimation.delete(key);
-                            setInAnimation(inAnimation);
-                        }}
+                        key={motionKey[key] || key}
                     >
                         <div className="items-center justify-between">
-                            <img src={TilePics[key]} className={`rounded-2xl ${isPhone ? "size-6" : "size-8"}`}/>
+                            <img src={TilePics[key]} alt="tile"
+                                 className={`rounded-2xl ${isPhone ? "size-6" : "size-8"}`}/>
                         </div>
                         <div className="items-center">Yours: {value} /
                             Global: {clickRecord.global[key] ?? 0}</div>
