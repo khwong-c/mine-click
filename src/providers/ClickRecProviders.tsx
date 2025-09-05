@@ -38,7 +38,7 @@ const ClickRecProviders = (props: PropsWithChildren) => {
         }, [localTileRecord, updateTileRecord]
     )
 
-    const clickRecController = async (payload: ClickRecDispatchPayload) => {
+    const clickRecController = useCallback((payload: ClickRecDispatchPayload) => {
         switch (payload.command) {
             case "add": {
                 const type = payload.tileType ?? "";
@@ -53,16 +53,19 @@ const ClickRecProviders = (props: PropsWithChildren) => {
             default:
                 break;
         }
-    }
+    }, [addTileToLocalRecord])
+
     useEffect(() => {
         ws.setCallbacks({
             id: "clickRec",
-            onClick: addTileToLocalRecord,
+            onClick: (tile) => {
+                clickRecController({command: "add", tileType: tile})
+            },
             onGlobalClickRecord: (rec) => {
-                globalClickRecDispatch({command: "set", newRecord: rec ?? {}});
+                clickRecController({command: "set", newRecord: rec ?? {}});
             },
         });
-    }, [ws, globalClickRecDispatch, addTileToLocalRecord]);
+    }, [ws, clickRecController]);
 
     const localWithZeros = {
         ...Object.fromEntries(Object.keys(globalClickRec).map((k) => [k, 0])),
