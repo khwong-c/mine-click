@@ -44,9 +44,7 @@ export default function WSProvider(props: React.PropsWithChildren) {
             },
             shouldReconnect: () => true,
             disableJson: false,
-            heartbeat: {
-                returnMessage: "pong",
-            }
+            heartbeat: true,
         });
     return (
         <WebSocketContext.Provider value={{
